@@ -20,7 +20,7 @@ func CreateOrder(c *fiber.Ctx) error {
 	}
 
 	var user models.User
-	if err := findUser(int(order.UserRefer), &user, c); err != nil {
+	if err := findUser(int(order.UserID), &user, c); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(dto.GenericResponse{
 			Status:  "failed",
 			Message: "invalid user",
@@ -28,7 +28,7 @@ func CreateOrder(c *fiber.Ctx) error {
 	}
 
 	var product models.Product
-	if err := findProduct(int(order.ProductRefer), &product, c); err != nil {
+	if err := findProduct(int(order.ProductID), &product, c); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(dto.GenericResponse{
 			Status:  "failed",
 			Message: "invalid product",
@@ -47,7 +47,7 @@ func CreateOrder(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusCreated).JSON(dto.GenericResponse{
 		Status: "success",
-		Data:   dto.CreateResponseOrder(order, responseUser, responseProduct),
+		Data:   dto.CreateResponseOrder(order, &responseUser, &responseProduct),
 	})
 }
 
@@ -63,15 +63,17 @@ func GetOrders(c *fiber.Ctx) error {
 	var responseOrders []dto.OrderDTO
 	for _, order := range orders {
 		var user models.User
-		findUser(int(order.UserRefer), &user, c)
+		findUser(int(order.UserID), &user, c)
 
 		var product models.Product
-		findProduct(int(order.ProductRefer), &product, c)
+		findProduct(int(order.ProductID), &product, c)
 
+		responseUser := dto.CreateResponseUser(user)
+		responseProduct := dto.CreateResponseProduct(product)
 		responseOrder := dto.CreateResponseOrder(
 			order,
-			dto.CreateResponseUser(user),
-			dto.CreateResponseProduct(product),
+			&responseUser,
+			&responseProduct,
 		)
 		responseOrders = append(responseOrders, responseOrder)
 	}
@@ -100,17 +102,19 @@ func GetOrderByID(c *fiber.Ctx) error {
 	}
 
 	var user models.User
-	findUser(int(order.UserRefer), &user, c)
+	findUser(int(order.UserID), &user, c)
 
 	var product models.Product
-	findProduct(int(order.ProductRefer), &product, c)
+	findProduct(int(order.ProductID), &product, c)
 
+	responseUser := dto.CreateResponseUser(user)
+	responseProduct := dto.CreateResponseProduct(product)
 	return c.Status(http.StatusOK).JSON(dto.GenericResponse{
 		Status: "success",
 		Data: dto.CreateResponseOrder(
 			order,
-			dto.CreateResponseUser(user),
-			dto.CreateResponseProduct(product),
+			&responseUser,
+			&responseProduct,
 		),
 	})
 }

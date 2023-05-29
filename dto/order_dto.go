@@ -7,13 +7,13 @@ import (
 )
 
 type OrderDTO struct {
-	ID        uint       `json:"id"`
-	User      UserDTO    `json:"user"`
-	Product   ProductDTO `json:"product,omitempty"`
-	CreatedAt time.Time  `json:"created_at"`
+	ID        uint        `json:"id"`
+	User      *UserDTO    `json:"user,omitempty"`
+	Product   *ProductDTO `json:"product,omitempty"`
+	CreatedAt time.Time   `json:"created_at"`
 }
 
-func CreateResponseOrder(order models.Order, userDTO UserDTO, productDTO ProductDTO) OrderDTO {
+func CreateResponseOrder(order models.Order, userDTO *UserDTO, productDTO *ProductDTO) OrderDTO {
 	return OrderDTO{
 		ID:        order.ID,
 		User:      userDTO,
